@@ -16,10 +16,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from newapp import views
+from django.conf import settings
+from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/user/',views.UserListView.as_view()),
     path('api/education/',views.EducationListView.as_view()),
     path('api/experience/',views.ExperienceListView.as_view()),
     path('api/skills/',views.SkillListView.as_view()),
-]
+    path('api/resume/',views.ResumeView.as_view()),
+    path('api/resume/<int:id>/',views.ResumedetailView.as_view()),
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

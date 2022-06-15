@@ -31,32 +31,24 @@ class ExperienceModel(models.Model):
     Company_name = models.CharField(max_length=255)
     city = models.CharField(max_length=255)
     country = models.CharField(max_length=255)
-    start_date = models.DateField()
-    end_date = models.DateField()
+    start_date = models.DateField(blank=True,null=True)
+    end_date = models.DateField(blank=True,null=True)
     job_discription = models.CharField(max_length=255)
     project_urls = models.URLField(null=True, blank=True)
 
     def __str__(self) -> str:
         return self.job_title
 
-degree_choice = (
-    ('10th','10th'),
-    ('11th','11th'),
-    ('12th','12th'),
-    ('bachelor','bachelor'),
-    ('masters','masters'),
-    ('phd','phd'),
 
-)
 
 class EducationModel(models.Model):
     user = models.ForeignKey(UserInformations,on_delete=models.CASCADE)
     school_name = models.CharField(max_length=255)
     school_location = models.CharField(max_length=255)
-    degree = models.TextField(choices=degree_choice)
+    degree = models.CharField(max_length=255)
     field_of_study = models.CharField(max_length=255)
-    start_date = models.DateField()
-    end_date = models.DateField()
+    start_date = models.DateField(blank=True,null=True)
+    end_date = models.DateField(blank=True,null=True)
 
     def __str__(self) -> str:
         return self.school_name

@@ -4,7 +4,7 @@ from .models import *
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserInformations
-        fields = '__all__'
+        fields = ['id','profile_image','first_name','last_name','profession','city','country','phone_number','pin_code','email','social_links','profile_summary']
 
 class EducationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -20,3 +20,22 @@ class SkillSerializer(serializers.ModelSerializer):
     class Meta:
         model = SkillsModel
         fields = '__all__'
+
+class ResumeSerializer(serializers.ModelSerializer):
+    Experience = serializers.SerializerMethodField()
+    Education = serializers.SerializerMethodField()
+    skills = serializers.SlugRelatedField(
+        many=True,
+        read_only=True,
+        slug_field='skills',
+    )
+    class Meta:
+        model = UserInformations
+        fields = ['profile_image','first_name','last_name','profession','city','country','phone_number','pin_code','email','social_links','profile_summary','Education','Experience','skills']
+    def get_Experience(self,instance):
+        data = ExperienceModel.objects.filter(user=instance.id)
+        return ExperienceSerializer(data,many=True).data
+
+    def get_Education(self,instance):
+        data = EducationModel.objects.filter(user=instance.id)
+        return EducationSerializer(data,many=True).data

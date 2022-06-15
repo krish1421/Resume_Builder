@@ -13,7 +13,6 @@ class UserListView(APIView):
 
     def post(self, request):
         serializer = UserSerializer(data = request.data)
-        # import pdb;pdb.set_trace()
         # skill_data = request.data.getlist('skills_list',list())
         if serializer.is_valid():
             serializer.save()
@@ -54,7 +53,6 @@ class EducationListView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
-        # import pdb;pdb.set_trace()
         request_data = request.data.copy()
         user = UserInformations.objects.filter(id=request.data.get('user')).first()
         request_data['user'] = user.id
@@ -72,7 +70,6 @@ class ExperienceListView(APIView):
 
     def post(self, request):
         request_data = request.data.copy()
-        import pdb;pdb.set_trace()
         user = UserInformations.objects.filter(id=request.data.get('user')).first()
         request_data['user'] = user.id
         serializer = ExperienceSerializer(data=request_data)
@@ -90,17 +87,32 @@ class SkillListView(APIView):
     def post(self, request): 
         new = UserInformations.objects.filter(id=request.data.get('id')).first()
         if new:
-            serializer = SkillSerializer(data=request.data)
-            if serializer.is_valid():
-                skill_data = request.data
-                new1 = serializer.save()
-                for i in skill_data.items():
-                    skill_obj =  SkillsModel.objects.filter(skills=i[1]).first()
+            data = request.data.get("skills")
+            data = data.split(",")
+            for i in data:
+                request_data = request.data.copy()
+                request_data.pop('skills')
+                request_data['skills'] = i
+                serializer = SkillSerializer(data=request_data)
+                if serializer.is_valid():
+                    serializer.save()
+                    skill_obj = SkillsModel.objects.filter(skills=i).first()
                     new.skills.add(skill_obj)
-                new.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
+                    new.save() 
+                else:
+                    return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response("user not found", status=status.HTTP_404_NOT_FOUND)
         
+class ResumeView(APIView):
+    def get(self, request):
+        queryset = UserInformations.objects.all()
+        serializer = ResumeSerializer(queryset,many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-# class ResumeView(APIView):
+class ResumedetailView(APIView):
+    def get(self, request,id):
+        queryset = UserInformations.objects.filter(id=id).first()
+        serializer = ResumeSerializer(queryset)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
